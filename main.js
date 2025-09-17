@@ -76,45 +76,58 @@ function basketTotal() {
   }, 0);
 }
 
-function renderbasket() {
-  const basketList = document.querySelector('.basket-list');
-
-  const itemsHtml = basket.map(item => {
-    const q = item.quantity || 1;
-    return `
-      <li data-id="${item.id}">
-        <div class="basket-item">
-          <p>${item.name} — ${item.price} руб.</p>
-          <div class="quantity-controls">
-            <button class="decrease" aria-label="Уменьшить">−</button>
-            <span class="quantity">${q}</span>
-            <button class="increase" aria-label="Увеличить">+</button>
-          </div>
-        </div>
-      </li>
-    `;
-  }).join('');
-  localStorage.setItem('basket', JSON.stringify(basket)); 
-  basketList.innerHTML = `
-    <div>
-        <ul class="basket-ul">
-        ${itemsHtml || '<li><em>Корзина пуста</em></li>'}
-        </ul>
-    </div><br>
-    <div class="price-counter">
-        <p>Общая сумма: <strong>${basketTotal()} руб.</strong></p>
-        <buttom class="checkout-button">Оформить заказ</button>
-    </div>
-  `;
+function bindCheckout() {
+    const checkoutButton = document.querySelector('.checkout-button');
+    if (!checkoutButton) return;
+    checkoutButton.onclick = () => {
+        if (!basket.length) return alert('Ваша корзина пуста!');
+        document.querySelector('.modal').classList.add('is-open');
+    };
 }
+
+function renderbasket() {
+    const basketList = document.querySelector('.basket-list');
+
+    const itemsHtml = basket.map(item => {
+      const q = item.quantity || 1;
+      return `
+        <li data-id="${item.id}">
+            <div class="basket-item">
+              <p>${item.name} — ${item.price} руб.</p>
+              <div class="quantity-controls">
+                  <button class="decrease" aria-label="Уменьшить">−</button>
+                  <span class="quantity">${q}</span>
+                  <button class="increase" aria-label="Увеличить">+</button>
+              </div>
+            </div>
+        </li>
+      `;
+    }).join('');
+    localStorage.setItem('basket', JSON.stringify(basket)); 
+    basketList.innerHTML = `
+        <div>
+            <ul class="basket-ul">
+            ${itemsHtml || '<li><em>Корзина пуста</em></li>'}
+            </ul>
+        </div><br>
+        <div class="price-counter">
+            <p>Общая сумма: <strong>${basketTotal()} руб.</strong></p>
+            <buttom class="checkout-button">Оформить заказ</button>
+        </div>
+      `;
+    bindCheckout();
+}
+
 localStorage.getItem('basket') && JSON.parse(localStorage.getItem('basket')).forEach(item => basket.push(item));
 renderbasket();
+
 document.addEventListener('click', (e) => {
   const decBtn = e.target.closest('.decrease');
   const incBtn = e.target.closest('.increase');
   if (!decBtn && !incBtn) return;
 
   const li = e.target.closest('li[data-id]');
+
   if (!li) return;
 
   const id = Number(li.getAttribute('data-id'));
@@ -146,4 +159,27 @@ buyButtons.forEach(button => {
         }
         renderbasket();
     })
+});
+
+const modal = document.querySelector('.modal');
+const closeModalBtn = document.querySelector('.close-button');
+const form = document.getElementById('order-form');
+const successBlock = document.querySelector('.success');
+
+closeModalBtn.addEventListener('click', () => {
+    modal.classList.remove('is-open');
+});
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    successBlock.style.display = 'block';
+    form.style.display = 'none';
+    basket.length = 0;
+    renderbasket();
+    form.reset();
+});
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.classList.remove('is-open');
+    }
 });
