@@ -31,6 +31,12 @@ const productlist = [
     }
 ];
 const basket = [];
+const catalogList = document.getElementById('catalog-list');
+const buyButtons = document.querySelectorAll('.buy-button');
+const modal = document.querySelector('.modal');
+const closeModalBtn = document.querySelector('.close-button');
+const form = document.getElementById('order-form');
+const successBlock = document.querySelector('.success');
 
 function createCard(product) {
     const card = document.createElement('div');
@@ -134,15 +140,11 @@ document.addEventListener('click', (e) => {
   changeQuantity(id, incBtn ? +1 : -1);
 });
 
-
-
-const catalogList = document.getElementById('catalog-list');
 productlist.forEach(product => {
     const card = createCard(product);
     catalogList.appendChild(card);
 });
 
-const buyButtons = document.querySelectorAll('.buy-button');
 buyButtons.forEach(button => {
     button.addEventListener('click', () => {
         let flag = true;
@@ -160,11 +162,6 @@ buyButtons.forEach(button => {
         renderbasket();
     })
 });
-
-const modal = document.querySelector('.modal');
-const closeModalBtn = document.querySelector('.close-button');
-const form = document.getElementById('order-form');
-const successBlock = document.querySelector('.success');
 
 closeModalBtn.addEventListener('click', () => {
     modal.classList.remove('is-open');
